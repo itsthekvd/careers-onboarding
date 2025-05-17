@@ -1,0 +1,16 @@
+export const VIDEO_URLS = {
+  TICKTICK: "https://www.youtube.com/watch?v=eIw6hH43Psc",
+  V0_AI: "https://www.youtube.com/watch?v=qC2_wDdiIgI",
+  ROADMAP_1: "https://www.youtube.com/watch?v=1bWAfgElne8",
+  ROADMAP_2: "https://www.youtube.com/watch?v=K6SwPslThyY",
+  THREE_THINGS: "https://www.youtube.com/watch?v=C8W0jJWS43w",
+  NOTION_1: "https://www.youtube.com/watch?v=nN1ZpFGMwtU",
+  NOTION_2: "https://www.youtube.com/watch?v=0d7nUfRw1MI",
+  NOTION_3: "https://www.youtube.com/watch?v=D10lFJ2nE5g",
+  NOTION_4: "https://www.youtube.com/watch?v=7FWBHsFL268",
+  BASECAMP: "https://www.youtube.com/watch?v=MLyAb-LvQ1Y",
+  CRM_1: "https://www.youtube.com/watch?v=XZNamCg93Co",
+  CRM_2: "https://www.youtube.com/watch?v=FQA1njR3T_U",
+  GOOGLE_SPACE_1: "https://www.youtube.com/watch?v=VhbWaJQy5zM",
+  GOOGLE_SPACE_2: "https://www.youtube.com/watch?v=pMGp9I8Ov9g",
+}
