@@ -1,6 +1,5 @@
 export const VIDEO_URLS = {
   TICKTICK: "https://www.youtube.com/watch?v=eIw6hH43Psc",
-  V0_AI: "https://www.youtube.com/watch?v=qC2_wDdiIgI",
   ROADMAP_1: "https://www.youtube.com/watch?v=1bWAfgElne8",
   ROADMAP_2: "https://www.youtube.com/watch?v=K6SwPslThyY",
   THREE_THINGS: "https://www.youtube.com/watch?v=C8W0jJWS43w",

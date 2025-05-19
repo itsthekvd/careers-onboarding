@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { ExternalLink } from "lucide-react"
+import { ExternalLink, BellRing, Smartphone } from "lucide-react"
 import { updateUserStepAction } from "./update-step-actions"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
@@ -15,8 +15,6 @@ export function Step5Form({ submissionId, token }: { submissionId: string; token
   const [error, setError] = useState("")
 
   // Form state
-  // Replace the single videosWatched state with individual states for each section
-  const [v0AIWatched, setV0AIWatched] = useState(false)
   const [roadmapVideosWatched, setRoadmapVideosWatched] = useState(false)
   const [threeThingsWatched, setThreeThingsWatched] = useState(false)
   const [notionTutorialsWatched, setNotionTutorialsWatched] = useState(false)
@@ -24,6 +22,7 @@ export function Step5Form({ submissionId, token }: { submissionId: string; token
   const [crmTutorialsWatched, setCrmTutorialsWatched] = useState(false)
   const [googleSpaceWatched, setGoogleSpaceWatched] = useState(false)
   const [nextStepsRead, setNextStepsRead] = useState(false)
+  const [appsNotificationsAgreed, setAppsNotificationsAgreed] = useState(false)
   const [questions, setQuestions] = useState("")
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -32,16 +31,18 @@ export function Step5Form({ submissionId, token }: { submissionId: string; token
     setError("")
 
     if (
-      !v0AIWatched ||
       !roadmapVideosWatched ||
       !threeThingsWatched ||
       !notionTutorialsWatched ||
       !basecampWatched ||
       !crmTutorialsWatched ||
       !googleSpaceWatched ||
-      !nextStepsRead
+      !nextStepsRead ||
+      !appsNotificationsAgreed
     ) {
-      setError("Please confirm that you have watched all the videos and read the next steps")
+      setError(
+        "Please confirm that you have watched all the videos, read the next steps, and agree to install the apps with notifications enabled",
+      )
       setIsSubmitting(false)
       return
     }
@@ -49,7 +50,6 @@ export function Step5Form({ submissionId, token }: { submissionId: string; token
     try {
       // Store the data in the database
       const formData = new FormData()
-      formData.append("v0AIWatched", v0AIWatched.toString())
       formData.append("roadmapVideosWatched", roadmapVideosWatched.toString())
       formData.append("threeThingsWatched", threeThingsWatched.toString())
       formData.append("notionTutorialsWatched", notionTutorialsWatched.toString())
@@ -57,6 +57,7 @@ export function Step5Form({ submissionId, token }: { submissionId: string; token
       formData.append("crmTutorialsWatched", crmTutorialsWatched.toString())
       formData.append("googleSpaceWatched", googleSpaceWatched.toString())
       formData.append("nextStepsRead", nextStepsRead.toString())
+      formData.append("appsNotificationsAgreed", appsNotificationsAgreed.toString())
       formData.append("questions", questions)
 
       // Submit the form data to the server
@@ -141,31 +142,6 @@ export function Step5Form({ submissionId, token }: { submissionId: string; token
             </div>
 
             <div className="p-4 space-y-4">
-              {/* V0 AI and Prompt Engineering Video - NEW SECTION */}
-              <div className="border-b pb-4">
-                <h4 className="font-medium mb-2">V0 AI and Prompt Engineering</h4>
-                <div className="aspect-video w-full max-w-2xl mx-auto">
-                  <iframe
-                    src="https://www.youtube.com/embed/qC2_wDdiIgI"
-                    title="V0 AI and Prompt Engineering"
-                    className="w-full h-full rounded-md"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  ></iframe>
-                </div>
-                <div className="mt-4 flex items-center">
-                  <Checkbox
-                    id="v0-ai-video"
-                    checked={v0AIWatched}
-                    onCheckedChange={(checked) => setV0AIWatched(checked === true)}
-                    className="mr-2 h-4 w-4"
-                  />
-                  <Label htmlFor="v0-ai-video" className="text-sm">
-                    I've watched the V0 AI and Prompt Engineering video
-                  </Label>
-                </div>
-              </div>
-
               {/* Roadmap Videos */}
               <div className="border-b pb-4">
                 <h4 className="font-medium mb-2">Roadmap Videos</h4>
@@ -475,26 +451,101 @@ export function Step5Form({ submissionId, token }: { submissionId: string; token
             </ol>
           </div>
 
+          {/* Important Apps & Notifications Section */}
+          <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg border-l-4 border-yellow-400 dark:border-yellow-600">
+            <h3 className="text-base font-bold mb-2 flex items-center">
+              <BellRing className="h-5 w-5 text-yellow-500 mr-2" />
+              IMPORTANT: Install Apps & Enable Notifications
+            </h3>
+            <p className="text-sm mb-3">
+              You <strong>must</strong> install both Zoho Cliq and TickTick mobile apps and enable all notifications to
+              ensure you don't miss any important communications or tasks.
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div className="bg-white dark:bg-gray-800 p-3 rounded-lg border border-gray-200 dark:border-gray-700">
+                <h4 className="font-medium text-sm mb-2 flex items-center">
+                  <Smartphone className="h-4 w-4 mr-2 text-blue-500" />
+                  Zoho Cliq
+                </h4>
+                <ol className="list-decimal pl-5 text-xs space-y-1">
+                  <li>Install from App Store/Google Play</li>
+                  <li>Login with yourfirstname@itskaivalya.com</li>
+                  <li>Password: Yourfirstname.Yourlastname@A123</li>
+                  <li>Go to Settings → Notifications</li>
+                  <li>Enable ALL notification options</li>
+                </ol>
+              </div>
+
+              <div className="bg-white dark:bg-gray-800 p-3 rounded-lg border border-gray-200 dark:border-gray-700">
+                <h4 className="font-medium text-sm mb-2 flex items-center">
+                  <Smartphone className="h-4 w-4 mr-2 text-blue-500" />
+                  TickTick
+                </h4>
+                <ol className="list-decimal pl-5 text-xs space-y-1">
+                  <li>Check Zoho Mail for invitation</li>
+                  <li>Install from App Store/Google Play</li>
+                  <li>Login with credentials from email</li>
+                  <li>Go to Settings → Notifications</li>
+                  <li>Enable ALL notification options</li>
+                </ol>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-3 mt-4">
+              <Checkbox
+                id="apps-notifications-agreed"
+                checked={appsNotificationsAgreed}
+                onCheckedChange={(checked) => setAppsNotificationsAgreed(checked === true)}
+                className="h-5 w-5"
+              />
+              <Label htmlFor="apps-notifications-agreed" className="font-medium text-sm">
+                I agree to install both apps and enable all notifications
+              </Label>
+            </div>
+          </div>
+
           {/* Next Steps Section */}
           <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-100 dark:border-blue-800">
             <h3 className="text-base font-bold mb-2">Thank You! Here are the next steps:</h3>
-            <p className="text-sm mb-4">
-              Click the button below to access your TickTick dashboard. This will take you to the project management
-              tool where you'll be working.
+            <p className="text-sm mb-2">
+              After completing this onboarding, you'll need to log in to Zoho Cliq to communicate with the team.
+            </p>
+            <div className="text-sm mb-4">
+              <strong>Zoho Cliq Login Details:</strong>
+              <ul className="list-disc pl-5 mt-1 space-y-1">
+                <li>
+                  Login URL:{" "}
+                  <a
+                    href="https://cliq.zoho.in/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline"
+                  >
+                    https://cliq.zoho.in/
+                  </a>
+                </li>
+                <li>Login ID: yourfirstname@itskaivalya.com</li>
+                <li>Password: Yourfirstname.Yourlastname@A123</li>
+              </ul>
+            </div>
+            <p className="text-sm">
+              You will receive your TickTick access invitation in your Zoho Mail inbox at{" "}
+              <a
+                href="https://mail.zoho.in/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:underline"
+              >
+                mail.zoho.in
+              </a>
+              .
             </p>
           </div>
 
           <div className="space-y-4 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
             <h3 className="font-semibold text-lg">Completion Checklist</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div className="flex items-center space-x-2">
-                <div
-                  className={`w-5 h-5 rounded-full flex items-center justify-center ${v0AIWatched ? "bg-green-100 text-green-600" : "bg-gray-100 text-gray-400"}`}
-                >
-                  {v0AIWatched ? "✓" : ""}
-                </div>
-                <span className="text-sm">V0 AI and Prompt Engineering</span>
-              </div>
               <div className="flex items-center space-x-2">
                 <div
                   className={`w-5 h-5 rounded-full flex items-center justify-center ${roadmapVideosWatched ? "bg-green-100 text-green-600" : "bg-gray-100 text-gray-400"}`}
@@ -543,6 +594,14 @@ export function Step5Form({ submissionId, token }: { submissionId: string; token
                 </div>
                 <span className="text-sm">Google Space</span>
               </div>
+              <div className="flex items-center space-x-2">
+                <div
+                  className={`w-5 h-5 rounded-full flex items-center justify-center ${appsNotificationsAgreed ? "bg-green-100 text-green-600" : "bg-gray-100 text-gray-400"}`}
+                >
+                  {appsNotificationsAgreed ? "✓" : ""}
+                </div>
+                <span className="text-sm">Install Apps & Enable Notifications</span>
+              </div>
             </div>
 
             <div className="flex items-center space-x-3 mt-4 pt-4 border-t">
@@ -564,7 +623,7 @@ export function Step5Form({ submissionId, token }: { submissionId: string; token
 
           <div className="flex justify-center">
             <a
-              href="https://ticktick.com/pub/project/collaboration/invite/9239d23c7a7144759702d6c802e4eb98?u=6d9ea2da0a274ab4b68daffa4e4b4a4f"
+              href="https://cliq.zoho.in/"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
@@ -572,16 +631,18 @@ export function Step5Form({ submissionId, token }: { submissionId: string; token
                 e.preventDefault()
 
                 if (
-                  !v0AIWatched ||
                   !roadmapVideosWatched ||
                   !threeThingsWatched ||
                   !notionTutorialsWatched ||
                   !basecampWatched ||
                   !crmTutorialsWatched ||
                   !googleSpaceWatched ||
-                  !nextStepsRead
+                  !nextStepsRead ||
+                  !appsNotificationsAgreed
                 ) {
-                  setError("Please confirm that you have watched all the videos and read the next steps")
+                  setError(
+                    "Please confirm that you have watched all the videos, read the next steps, and agree to install the apps with notifications enabled",
+                  )
                   return
                 }
 
@@ -591,7 +652,6 @@ export function Step5Form({ submissionId, token }: { submissionId: string; token
                 try {
                   // Store the data in the database
                   const formData = new FormData()
-                  formData.append("v0AIWatched", v0AIWatched.toString())
                   formData.append("roadmapVideosWatched", roadmapVideosWatched.toString())
                   formData.append("threeThingsWatched", threeThingsWatched.toString())
                   formData.append("notionTutorialsWatched", notionTutorialsWatched.toString())
@@ -599,6 +659,7 @@ export function Step5Form({ submissionId, token }: { submissionId: string; token
                   formData.append("crmTutorialsWatched", crmTutorialsWatched.toString())
                   formData.append("googleSpaceWatched", googleSpaceWatched.toString())
                   formData.append("nextStepsRead", nextStepsRead.toString())
+                  formData.append("appsNotificationsAgreed", appsNotificationsAgreed.toString())
                   formData.append("questions", questions)
 
                   // Submit the form data to the server
@@ -615,11 +676,8 @@ export function Step5Form({ submissionId, token }: { submissionId: string; token
                     const stepResult = await updateUserStepAction(submissionId, token, 5)
 
                     if (stepResult.success) {
-                      // Open the TickTick dashboard in a new tab
-                      window.open(
-                        "https://ticktick.com/pub/project/collaboration/invite/9239d23c7a7144759702d6c802e4eb98?u=6d9ea2da0a274ab4b68daffa4e4b4a4f",
-                        "_blank",
-                      )
+                      // Open Zoho Cliq in a new tab
+                      window.open("https://cliq.zoho.in/", "_blank")
                       // Redirect to the completion page
                       router.push(`/onboarding/${submissionId}/complete?token=${token}`)
                     } else {
@@ -636,7 +694,7 @@ export function Step5Form({ submissionId, token }: { submissionId: string; token
                 }
               }}
             >
-              {isSubmitting ? "Processing..." : "Access TickTick Dashboard"}{" "}
+              {isSubmitting ? "Processing..." : "Complete Onboarding & Access Zoho Cliq"}{" "}
               {!isSubmitting && <ExternalLink className="ml-2 h-4 w-4" />}
             </a>
           </div>
