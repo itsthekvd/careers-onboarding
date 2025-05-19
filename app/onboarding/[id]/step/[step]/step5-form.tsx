@@ -142,28 +142,25 @@ export function Step5Form({ submissionId, token }: { submissionId: string; token
             </div>
 
             <div className="p-4 space-y-4">
+              <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-md mb-4 text-sm">
+                <p>
+                  <strong>Note:</strong> While we may not use all these specific tools in your role, the core
+                  principles, problem-solving approaches, and workflows demonstrated apply to our current systems. Focus
+                  on understanding the underlying concepts.
+                </p>
+              </div>
+
               {/* Roadmap Videos */}
               <div className="border-b pb-4">
                 <h4 className="font-medium mb-2">Roadmap Videos</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="aspect-video w-full">
-                    <iframe
-                      src="https://www.youtube.com/embed/1bWAfgElne8"
-                      title="Roadmap"
-                      className="w-full h-full rounded-md"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    ></iframe>
-                  </div>
-                  <div className="aspect-video w-full">
-                    <iframe
-                      src="https://www.youtube.com/embed/K6SwPslThyY"
-                      title="Roadmap"
-                      className="w-full h-full rounded-md"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    ></iframe>
-                  </div>
+                <div className="aspect-video w-full max-w-2xl mx-auto">
+                  <iframe
+                    src="https://www.youtube.com/embed/1bWAfgElne8"
+                    title="Roadmap"
+                    className="w-full h-full rounded-md"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  ></iframe>
                 </div>
                 <div className="mt-4 flex items-center">
                   <Checkbox
@@ -526,11 +523,17 @@ export function Step5Form({ submissionId, token }: { submissionId: string; token
                   </a>
                 </li>
                 <li>Login ID: yourfirstname@itskaivalya.com</li>
-                <li>Password: Yourfirstname.Yourlastname@A123</li>
+                <li>
+                  Password: <span className="font-medium">Y</span>ourfirstname.<span className="font-medium">Y</span>
+                  ourlastname@A123{" "}
+                  <span className="text-xs italic">
+                    (First letter of both first name and last name should be capitalized)
+                  </span>
+                </li>
               </ul>
             </div>
             <p className="text-sm">
-              You will receive your TickTick access invitation in your Zoho Mail inbox at{" "}
+              You have already received your TickTick access invitation in your Zoho Mail inbox at{" "}
               <a
                 href="https://mail.zoho.in/"
                 target="_blank"
@@ -539,7 +542,7 @@ export function Step5Form({ submissionId, token }: { submissionId: string; token
               >
                 mail.zoho.in
               </a>
-              .
+              . Please check your inbox and accept the invitation.
             </p>
           </div>
 
