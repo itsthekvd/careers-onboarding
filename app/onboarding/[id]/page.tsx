@@ -1,5 +1,4 @@
-import { validateOnboardingToken, getCurrentStep } from "../actions"
-import { OnboardingStep1Form } from "./step1-form"
+import { validateOnboardingToken, getCurrentStep } from "./actions"
 import { ClientRedirect } from "./client-redirect"
 
 export default async function OnboardingPage({
@@ -7,66 +6,37 @@ export default async function OnboardingPage({
   searchParams,
 }: {
   params: { id: string }
-  searchParams: { token: string }
+  searchParams: { token?: string }
 }) {
   const { id } = params
-  const token = searchParams.token
+  const { token } = searchParams
 
-  console.log(`Onboarding page loaded for submission ${id}`)
-  console.log(`Token present: ${!!token}`)
-
-  // Handle missing token
   if (!token) {
-    console.log("No token provided, redirecting to home")
-    return <ClientRedirect to="/" />
+    // No token provided, show an error or redirect to a login page
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen p-4">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 max-w-md w-full text-center">
+          <h2 className="text-xl font-semibold text-yellow-700 mb-2">Access Token Required</h2>
+          <p className="text-yellow-600 mb-4">You need a valid access token to view this onboarding page.</p>
+          <p className="text-gray-600 text-sm">
+            Please use the link provided in your invitation email or contact the administrator.
+          </p>
+        </div>
+      </div>
+    )
   }
 
-  // Validate the token
-  console.log("Validating token...")
-  let isValid = false
-  try {
-    isValid = await validateOnboardingToken(id, token)
-    console.log(`Token validation result: ${isValid}`)
-  } catch (error) {
-    console.error("Error validating token:", error)
-  }
+  // Validate the token server-side
+  const isValid = await validateOnboardingToken(id, token)
 
   if (!isValid) {
-    console.log("Invalid token, redirecting to home")
-    return <ClientRedirect to="/" />
+    // Return the client redirect component with error handling
+    return <ClientRedirect to={`/onboarding/${id}`} submissionId={id} token={token} />
   }
 
-  // Check if user has already started onboarding
-  let currentStep = 1
-  try {
-    console.log("Getting current step...")
-    currentStep = await getCurrentStep(id)
-    console.log(`Current step: ${currentStep}`)
-  } catch (error) {
-    console.error("Error getting current step:", error)
-    // Continue with step 1 if there's an error
-  }
+  // Get the current step for this user
+  const currentStep = await getCurrentStep(id)
 
-  // If user has already completed step 1, redirect to their current step
-  if (currentStep > 1) {
-    console.log(`Redirecting to step ${currentStep}`)
-    return <ClientRedirect to={`/onboarding/${id}/step/${currentStep}?token=${token}`} />
-  }
-
-  // Render step 1 form
-  console.log("Rendering step 1 form")
-  return (
-    <div className="container mx-auto py-10 px-4 max-w-2xl">
-      <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold mb-2">Internship Onboarding</h1>
-        <p className="text-muted-foreground">Step 1 of 5: Personal Information</p>
-      </div>
-
-      <div className="w-full bg-secondary h-2 rounded-full mb-8">
-        <div className="bg-primary h-2 rounded-full" style={{ width: "20%" }}></div>
-      </div>
-
-      <OnboardingStep1Form submissionId={id} token={token} />
-    </div>
-  )
+  // Redirect to the current step
+  return <ClientRedirect to={`/onboarding/${id}/step/${currentStep}?token=${token}`} />
 }
