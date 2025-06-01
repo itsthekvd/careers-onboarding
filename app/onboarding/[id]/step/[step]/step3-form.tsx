@@ -216,11 +216,38 @@ export function Step3Form({ submissionId, token }: { submissionId: string; token
                   </p>
                 </div>
 
+                <h4 className="font-medium mt-4 mb-2">Accessing Your Invitation:</h4>
+                <ol className="list-decimal pl-5 space-y-2 mb-4">
+                  <li>
+                    First, access your Zoho Mail at{" "}
+                    <a
+                      href="https://mail.zoho.in/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline flex items-center"
+                    >
+                      mail.zoho.in <ExternalLink className="h-3 w-3 ml-1" />
+                    </a>
+                  </li>
+                  <li>Log in with your email (yourfirstname@itskaivalya.com)</li>
+                  <li>Use the password format: Yourfirstname.Yourlastname@A123 (with first letters capitalized)</li>
+                  <li>Check your inbox for the TickTick invitation email</li>
+                  <li>Click the invitation link in the email to join our TickTick workspace</li>
+                </ol>
+
+                <div className="bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-lg border border-yellow-100 dark:border-yellow-800 mb-4">
+                  <p className="font-medium">Important Note:</p>
+                  <p>
+                    Make sure to check your <strong>Zoho Mail</strong> inbox, not your personal email. The invitation
+                    was sent to your yourfirstname@itskaivalya.com address.
+                  </p>
+                </div>
+
                 <h4 className="font-medium mt-4 mb-2">Web Setup:</h4>
                 <ol className="list-decimal pl-5 space-y-2 mb-4">
-                  <li>Check your email for the TickTick invitation</li>
-                  <li>Click the invitation link and complete the access process</li>
-                  <li>Use your email address (yourfirstname@itskaivalya.com) to login</li>
+                  <li>After accepting the invitation, you'll be directed to TickTick</li>
+                  <li>Complete the account setup process if prompted</li>
+                  <li>Use your email address (yourfirstname@itskaivalya.com) for all logins</li>
                 </ol>
 
                 <div className="flex items-center mt-4 mb-3">
