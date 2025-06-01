@@ -153,14 +153,25 @@ export function Step5Form({ submissionId, token }: { submissionId: string; token
               {/* Roadmap Videos */}
               <div className="border-b pb-4">
                 <h4 className="font-medium mb-2">Roadmap Videos</h4>
-                <div className="aspect-video w-full max-w-2xl mx-auto">
-                  <iframe
-                    src="https://www.youtube.com/embed/1bWAfgElne8"
-                    title="Roadmap"
-                    className="w-full h-full rounded-md"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  ></iframe>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="aspect-video w-full">
+                    <iframe
+                      src="https://www.youtube.com/embed/1bWAfgElne8"
+                      title="Roadmap"
+                      className="w-full h-full rounded-md"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    ></iframe>
+                  </div>
+                  <div className="aspect-video w-full">
+                    <iframe
+                      src="https://www.youtube.com/embed/K6SwPslThyY"
+                      title="Roadmap"
+                      className="w-full h-full rounded-md"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    ></iframe>
+                  </div>
                 </div>
                 <div className="mt-4 flex items-center">
                   <Checkbox

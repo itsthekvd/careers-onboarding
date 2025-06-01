@@ -15,9 +15,9 @@ export async function validateOnboardingToken(submissionId: string, token: strin
       return false
     }
 
-    // Query the database to validate the token and check if it's disabled
+    // Query the database to validate the token
     const result = await sql`
-      SELECT id, disabled FROM submissions 
+      SELECT id FROM submissions 
       WHERE id = ${submissionId} 
       AND onboarding_token = ${token}
     `
@@ -27,21 +27,9 @@ export async function validateOnboardingToken(submissionId: string, token: strin
     // Check if we got a valid result
     const isValid = result && (Array.isArray(result) ? result.length > 0 : result.rows && result.rows.length > 0)
 
-    if (!isValid) {
-      console.log(`Token validation result: ${isValid}`)
-      return false
-    }
+    console.log(`Token validation result: ${isValid}`)
 
-    // Check if the token is disabled
-    const isDisabled = Array.isArray(result) ? result[0].disabled : result.rows[0].disabled
-
-    if (isDisabled) {
-      console.log("Token is valid but disabled")
-      return { valid: true, disabled: true }
-    }
-
-    console.log("Token is valid and enabled")
-    return { valid: true, disabled: false }
+    return isValid
   } catch (error) {
     console.error("Error validating token:", error)
     return false
@@ -69,29 +57,12 @@ export async function getCurrentStep(submissionId: string) {
 export async function submitOnboardingStep1(submissionId: string, token: string, formData: FormData) {
   try {
     // Validate the token first
-    const isValidResponse = await validateOnboardingToken(submissionId, token)
-
-    let isValid = false
-    let isDisabled = false
-
-    if (typeof isValidResponse === "object" && isValidResponse !== null) {
-      isValid = isValidResponse.valid === true
-      isDisabled = isValidResponse.disabled === true
-    } else if (typeof isValidResponse === "boolean") {
-      isValid = isValidResponse
-    }
+    const isValid = await validateOnboardingToken(submissionId, token)
 
     if (!isValid) {
       return {
         success: false,
         error: "Invalid token",
-      }
-    }
-
-    if (isDisabled) {
-      return {
-        success: false,
-        error: "Token is disabled",
       }
     }
 
@@ -159,29 +130,12 @@ export async function submitOnboardingStep1(submissionId: string, token: string,
 export async function updateOnboardingStep(submissionId: string, token: string, step: number, formData: FormData) {
   try {
     // Validate the token first
-    const isValidResponse = await validateOnboardingToken(submissionId, token)
-
-    let isValid = false
-    let isDisabled = false
-
-    if (typeof isValidResponse === "object" && isValidResponse !== null) {
-      isValid = isValidResponse.valid === true
-      isDisabled = isValidResponse.disabled === true
-    } else if (typeof isValidResponse === "boolean") {
-      isValid = isValidResponse
-    }
+    const isValid = await validateOnboardingToken(submissionId, token)
 
     if (!isValid) {
       return {
         success: false,
         error: "Invalid token",
-      }
-    }
-
-    if (isDisabled) {
-      return {
-        success: false,
-        error: "Token is disabled",
       }
     }
 
@@ -326,29 +280,12 @@ export async function updateOnboardingStep(submissionId: string, token: string, 
 export async function updateUserStep(submissionId: string, token: string, step: number) {
   try {
     // Validate the token first
-    const isValidResponse = await validateOnboardingToken(submissionId, token)
-
-    let isValid = false
-    let isDisabled = false
-
-    if (typeof isValidResponse === "object" && isValidResponse !== null) {
-      isValid = isValidResponse.valid === true
-      isDisabled = isValidResponse.disabled === true
-    } else if (typeof isValidResponse === "boolean") {
-      isValid = isValidResponse
-    }
+    const isValid = await validateOnboardingToken(submissionId, token)
 
     if (!isValid) {
       return {
         success: false,
         error: "Invalid token",
-      }
-    }
-
-    if (isDisabled) {
-      return {
-        success: false,
-        error: "Token is disabled",
       }
     }
 
