@@ -19,6 +19,7 @@ export async function getSubmissions() {
           s.status, 
           s.created_at,
           s.onboarding_token,
+          s.disabled,
           u.name,
           u.email,
           u.whatsapp,
@@ -143,6 +144,72 @@ export async function createOnboardingLink(submissionId: string) {
     return {
       success: false,
       error: "Failed to create onboarding link",
+    }
+  }
+}
+
+export async function disableSubmission(submissionId: string) {
+  try {
+    console.log(`Disabling submission ${submissionId}`)
+
+    // First ensure the disabled column exists
+    await sql`
+      ALTER TABLE submissions 
+      ADD COLUMN IF NOT EXISTS disabled BOOLEAN DEFAULT FALSE
+    `
+
+    // Update the submission to mark it as disabled
+    const result = await sql`
+      UPDATE submissions 
+      SET disabled = TRUE
+      WHERE id = ${submissionId}
+      RETURNING id, disabled
+    `
+
+    console.log("Disable result:", result)
+
+    revalidatePath("/admin")
+    console.log("Admin page revalidated")
+
+    return {
+      success: true,
+      message: "Submission disabled successfully",
+    }
+  } catch (error) {
+    console.error("Error disabling submission:", error)
+    return {
+      success: false,
+      error: "Failed to disable submission",
+    }
+  }
+}
+
+export async function enableSubmission(submissionId: string) {
+  try {
+    console.log(`Enabling submission ${submissionId}`)
+
+    // Update the submission to mark it as enabled
+    const result = await sql`
+      UPDATE submissions 
+      SET disabled = FALSE
+      WHERE id = ${submissionId}
+      RETURNING id, disabled
+    `
+
+    console.log("Enable result:", result)
+
+    revalidatePath("/admin")
+    console.log("Admin page revalidated")
+
+    return {
+      success: true,
+      message: "Submission enabled successfully",
+    }
+  } catch (error) {
+    console.error("Error enabling submission:", error)
+    return {
+      success: false,
+      error: "Failed to enable submission",
     }
   }
 }

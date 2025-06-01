@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { createOnboardingLink } from "./actions"
+import { createOnboardingLink, disableSubmission, enableSubmission } from "./actions"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
@@ -19,6 +19,7 @@ type Submission = {
   status: string
   created_at: string
   onboarding_token?: string
+  disabled?: boolean
   name?: string
   email?: string
   whatsapp?: string
@@ -30,6 +31,7 @@ export function SubmissionsTable({ submissions = [] }: { submissions: Submission
   const [linkStates, setLinkStates] = useState<Record<string, { loading: boolean; link?: string }>>({})
   const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({})
   const isMobile = useMobile()
+  const [disableStates, setDisableStates] = useState<Record<string, { loading: boolean }>>({})
 
   async function handleCreateLink(submissionId: string) {
     setLinkStates((prev) => ({
@@ -61,6 +63,54 @@ export function SubmissionsTable({ submissions = [] }: { submissions: Submission
     }
   }
 
+  async function handleDisableSubmission(submissionId: string) {
+    setDisableStates((prev) => ({
+      ...prev,
+      [submissionId]: { loading: true },
+    }))
+
+    try {
+      const result = await disableSubmission(submissionId)
+
+      if (result.success) {
+        alert("Submission disabled successfully")
+      } else {
+        alert(result.error || "Failed to disable submission")
+      }
+    } catch (error) {
+      alert("An unexpected error occurred")
+    } finally {
+      setDisableStates((prev) => ({
+        ...prev,
+        [submissionId]: { loading: false },
+      }))
+    }
+  }
+
+  async function handleEnableSubmission(submissionId: string) {
+    setDisableStates((prev) => ({
+      ...prev,
+      [submissionId]: { loading: true },
+    }))
+
+    try {
+      const result = await enableSubmission(submissionId)
+
+      if (result.success) {
+        alert("Submission enabled successfully")
+      } else {
+        alert(result.error || "Failed to enable submission")
+      }
+    } catch (error) {
+      alert("An unexpected error occurred")
+    } finally {
+      setDisableStates((prev) => ({
+        ...prev,
+        [submissionId]: { loading: false },
+      }))
+    }
+  }
+
   function copyToClipboard(text: string) {
     navigator.clipboard.writeText(window.location.origin + text)
     alert("Link copied to clipboard")
@@ -70,7 +120,18 @@ export function SubmissionsTable({ submissions = [] }: { submissions: Submission
     return new Date(dateString).toLocaleString()
   }
 
-  function getStatusBadge(status: string) {
+  function getStatusBadge(status: string, disabled?: boolean) {
+    if (disabled) {
+      return (
+        <Badge
+          variant="outline"
+          className="bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800"
+        >
+          Disabled
+        </Badge>
+      )
+    }
+
     switch (status) {
       case "pending":
         return (
@@ -715,7 +776,7 @@ export function SubmissionsTable({ submissions = [] }: { submissions: Submission
                       <div className="text-sm text-muted-foreground">{formatDate(submission.created_at)}</div>
                     </div>
                     <div className="flex items-center gap-2">
-                      {getStatusBadge(submission.status)}
+                      {getStatusBadge(submission.status, submission.disabled)}
                       {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                     </div>
                   </div>
@@ -781,6 +842,34 @@ export function SubmissionsTable({ submissions = [] }: { submissions: Submission
                         >
                           <LinkIcon className="h-3 w-3 mr-1" />
                           {linkStates[submission.id]?.loading ? "Creating..." : "Create Link"}
+                        </Button>
+                      )}
+
+                      {submission.disabled ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleEnableSubmission(submission.id)
+                          }}
+                          disabled={disableStates[submission.id]?.loading}
+                          className="bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
+                        >
+                          {disableStates[submission.id]?.loading ? "Enabling..." : "Enable"}
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleDisableSubmission(submission.id)
+                          }}
+                          disabled={disableStates[submission.id]?.loading}
+                          className="bg-red-50 text-red-700 border-red-200 hover:bg-red-100"
+                        >
+                          {disableStates[submission.id]?.loading ? "Disabling..." : "Disable"}
                         </Button>
                       )}
                     </div>
@@ -854,7 +943,7 @@ export function SubmissionsTable({ submissions = [] }: { submissions: Submission
                       </TooltipProvider>
                     </TableCell>
                     <TableCell onClick={() => toggleRowExpansion(submission.id)}>
-                      {getStatusBadge(submission.status)}
+                      {getStatusBadge(submission.status, submission.disabled)}
                     </TableCell>
                     <TableCell onClick={() => toggleRowExpansion(submission.id)}>
                       {submission.name ? (
@@ -923,6 +1012,28 @@ export function SubmissionsTable({ submissions = [] }: { submissions: Submission
                           >
                             <LinkIcon className="h-3 w-3 mr-1" />
                             {linkStates[submission.id]?.loading ? "Creating..." : "Create Link"}
+                          </Button>
+                        )}
+
+                        {submission.disabled ? (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-8 bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
+                            onClick={() => handleEnableSubmission(submission.id)}
+                            disabled={disableStates[submission.id]?.loading}
+                          >
+                            {disableStates[submission.id]?.loading ? "Enabling..." : "Enable"}
+                          </Button>
+                        ) : (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-8 bg-red-50 text-red-700 border-red-200 hover:bg-red-100"
+                            onClick={() => handleDisableSubmission(submission.id)}
+                            disabled={disableStates[submission.id]?.loading}
+                          >
+                            {disableStates[submission.id]?.loading ? "Disabling..." : "Disable"}
                           </Button>
                         )}
                       </div>

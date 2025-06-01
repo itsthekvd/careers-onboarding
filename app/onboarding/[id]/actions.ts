@@ -15,9 +15,9 @@ export async function validateOnboardingToken(submissionId: string, token: strin
       return false
     }
 
-    // Query the database to validate the token
+    // Query the database to validate the token and check if disabled
     const result = await sql`
-      SELECT id FROM submissions 
+      SELECT id, disabled FROM submissions 
       WHERE id = ${submissionId} 
       AND onboarding_token = ${token}
     `
@@ -26,6 +26,18 @@ export async function validateOnboardingToken(submissionId: string, token: strin
 
     // Check if we got a valid result
     const isValid = result && (Array.isArray(result) ? result.length > 0 : result.rows && result.rows.length > 0)
+
+    if (!isValid) {
+      console.log("Invalid token or submission not found")
+      return false
+    }
+
+    // Check if submission is disabled
+    const submission = Array.isArray(result) ? result[0] : result.rows[0]
+    if (submission.disabled) {
+      console.log("Submission is disabled")
+      return false
+    }
 
     console.log(`Token validation result: ${isValid}`)
 
