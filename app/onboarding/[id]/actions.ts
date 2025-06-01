@@ -25,29 +25,23 @@ export async function validateOnboardingToken(submissionId: string, token: strin
     console.log("Token validation query result:", result)
 
     // Check if we got a valid result
-    let isValid = false
-    let isDisabled = false
-
-    if (Array.isArray(result) && result.length > 0) {
-      isValid = true
-      isDisabled = result[0].disabled === true
-    } else if (result && result.rows && result.rows.length > 0) {
-      isValid = true
-      isDisabled = result.rows[0].disabled === true
-    }
+    const isValid = result && (Array.isArray(result) ? result.length > 0 : result.rows && result.rows.length > 0)
 
     if (!isValid) {
       console.log("Invalid token or submission not found")
       return false
     }
 
-    if (isDisabled) {
-      console.log("Submission is disabled, access denied")
+    // Check if submission is disabled
+    const submission = Array.isArray(result) ? result[0] : result.rows[0]
+    if (submission.disabled) {
+      console.log("Submission is disabled")
       return false
     }
 
-    console.log(`Token validation successful, access granted`)
-    return true
+    console.log(`Token validation result: ${isValid}`)
+
+    return isValid
   } catch (error) {
     console.error("Error validating token:", error)
     return false
@@ -80,7 +74,7 @@ export async function submitOnboardingStep1(submissionId: string, token: string,
     if (!isValid) {
       return {
         success: false,
-        error: "Invalid token or access denied",
+        error: "Invalid token",
       }
     }
 
@@ -153,7 +147,7 @@ export async function updateOnboardingStep(submissionId: string, token: string, 
     if (!isValid) {
       return {
         success: false,
-        error: "Invalid token or access denied",
+        error: "Invalid token",
       }
     }
 
@@ -303,7 +297,7 @@ export async function updateUserStep(submissionId: string, token: string, step: 
     if (!isValid) {
       return {
         success: false,
-        error: "Invalid token or access denied",
+        error: "Invalid token",
       }
     }
 
