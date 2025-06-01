@@ -19,6 +19,7 @@ export async function getSubmissions() {
           s.status, 
           s.created_at,
           s.onboarding_token,
+          s.disabled,
           u.name,
           u.email,
           u.whatsapp,
@@ -116,7 +117,8 @@ export async function createOnboardingLink(submissionId: string) {
     // Update the submission with the token
     const result = await sql`
       UPDATE submissions 
-      SET onboarding_token = ${token}
+      SET onboarding_token = ${token},
+          disabled = FALSE
       WHERE id = ${submissionId}
       RETURNING id, onboarding_token
     `
@@ -143,6 +145,62 @@ export async function createOnboardingLink(submissionId: string) {
     return {
       success: false,
       error: "Failed to create onboarding link",
+    }
+  }
+}
+
+// New function to disable an onboarding token
+export async function disableOnboardingToken(submissionId: string) {
+  try {
+    console.log(`Disabling onboarding token for submission ${submissionId}`)
+
+    // Update the submission to disable the token
+    await sql`
+      UPDATE submissions 
+      SET disabled = TRUE
+      WHERE id = ${submissionId}
+    `
+
+    revalidatePath("/admin")
+    console.log("Admin page revalidated")
+
+    return {
+      success: true,
+      message: "Token disabled successfully",
+    }
+  } catch (error) {
+    console.error("Error disabling onboarding token:", error)
+    return {
+      success: false,
+      error: "Failed to disable token",
+    }
+  }
+}
+
+// New function to enable an onboarding token
+export async function enableOnboardingToken(submissionId: string) {
+  try {
+    console.log(`Enabling onboarding token for submission ${submissionId}`)
+
+    // Update the submission to enable the token
+    await sql`
+      UPDATE submissions 
+      SET disabled = FALSE
+      WHERE id = ${submissionId}
+    `
+
+    revalidatePath("/admin")
+    console.log("Admin page revalidated")
+
+    return {
+      success: true,
+      message: "Token enabled successfully",
+    }
+  } catch (error) {
+    console.error("Error enabling onboarding token:", error)
+    return {
+      success: false,
+      error: "Failed to enable token",
     }
   }
 }

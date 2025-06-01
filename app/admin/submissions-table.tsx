@@ -1,12 +1,12 @@
 "use client"
 
 import { useState } from "react"
-import { createOnboardingLink } from "./actions"
+import { createOnboardingLink, disableOnboardingToken, enableOnboardingToken } from "./actions"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { Copy, ExternalLink, LinkIcon, FileText, ChevronDown, ChevronRight, Eye } from "lucide-react"
+import { Copy, ExternalLink, LinkIcon, FileText, ChevronDown, ChevronRight, Eye, Lock, Unlock } from "lucide-react"
 import { useMobile } from "@/hooks/use-mobile"
 import Link from "next/link"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
@@ -19,6 +19,7 @@ type Submission = {
   status: string
   created_at: string
   onboarding_token?: string
+  disabled?: boolean
   name?: string
   email?: string
   whatsapp?: string
@@ -29,6 +30,7 @@ type Submission = {
 export function SubmissionsTable({ submissions = [] }: { submissions: Submission[] }) {
   const [linkStates, setLinkStates] = useState<Record<string, { loading: boolean; link?: string }>>({})
   const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({})
+  const [disableStates, setDisableStates] = useState<Record<string, { loading: boolean }>>({})
   const isMobile = useMobile()
 
   async function handleCreateLink(submissionId: string) {
@@ -54,6 +56,70 @@ export function SubmissionsTable({ submissions = [] }: { submissions: Submission
       }
     } catch (error) {
       setLinkStates((prev) => ({
+        ...prev,
+        [submissionId]: { loading: false },
+      }))
+      alert("An unexpected error occurred")
+    }
+  }
+
+  async function handleDisableToken(submissionId: string) {
+    setDisableStates((prev) => ({
+      ...prev,
+      [submissionId]: { loading: true },
+    }))
+
+    try {
+      const result = await disableOnboardingToken(submissionId)
+
+      if (result.success) {
+        setDisableStates((prev) => ({
+          ...prev,
+          [submissionId]: { loading: false },
+        }))
+        // Update the submission in the local state
+        submissions = submissions.map((sub) => (sub.id === submissionId ? { ...sub, disabled: true } : sub))
+      } else {
+        setDisableStates((prev) => ({
+          ...prev,
+          [submissionId]: { loading: false },
+        }))
+        alert(result.error || "Failed to disable token")
+      }
+    } catch (error) {
+      setDisableStates((prev) => ({
+        ...prev,
+        [submissionId]: { loading: false },
+      }))
+      alert("An unexpected error occurred")
+    }
+  }
+
+  async function handleEnableToken(submissionId: string) {
+    setDisableStates((prev) => ({
+      ...prev,
+      [submissionId]: { loading: true },
+    }))
+
+    try {
+      const result = await enableOnboardingToken(submissionId)
+
+      if (result.success) {
+        setDisableStates((prev) => ({
+          ...prev,
+          [submissionId]: { loading: false },
+        }))
+        // Update the submission in the local state
+        submissions = submissions.map((sub) => (sub.id === submissionId ? { ...sub, disabled: false } : sub))
+      } else {
+        setDisableStates((prev) => ({
+          ...prev,
+          [submissionId]: { loading: false },
+        }))
+        alert(result.error || "Failed to enable token")
+      }
+    } catch (error) {
+      setDisableStates((prev) => ({
         ...prev,
         [submissionId]: { loading: false },
       }))
@@ -691,6 +757,7 @@ export function SubmissionsTable({ submissions = [] }: { submissions: Submission
           submissions.map((submission) => {
             const existingLink = getExistingLink(submission)
             const isExpanded = expandedRows[submission.id] || false
+            const isDisabled = submission.disabled === true
 
             return (
               <div key={submission.id} className="border rounded-lg overflow-hidden">
@@ -716,6 +783,11 @@ export function SubmissionsTable({ submissions = [] }: { submissions: Submission
                     </div>
                     <div className="flex items-center gap-2">
                       {getStatusBadge(submission.status)}
+                      {isDisabled && (
+                        <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
+                          Disabled
+                        </Badge>
+                      )}
                       {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                     </div>
                   </div>
@@ -758,17 +830,49 @@ export function SubmissionsTable({ submissions = [] }: { submissions: Submission
                       )}
 
                       {existingLink || linkStates[submission.id]?.link ? (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            copyToClipboard(existingLink || linkStates[submission.id].link!)
-                          }}
-                        >
-                          <Copy className="h-3 w-3 mr-1" />
-                          Copy Link
-                        </Button>
+                        <>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              copyToClipboard(existingLink || linkStates[submission.id].link!)
+                            }}
+                          >
+                            <Copy className="h-3 w-3 mr-1" />
+                            Copy Link
+                          </Button>
+
+                          {isDisabled ? (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleEnableToken(submission.id)
+                              }}
+                              disabled={disableStates[submission.id]?.loading}
+                              className="bg-green-50 hover:bg-green-100 text-green-700"
+                            >
+                              <Unlock className="h-3 w-3 mr-1" />
+                              {disableStates[submission.id]?.loading ? "Enabling..." : "Enable Link"}
+                            </Button>
+                          ) : (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleDisableToken(submission.id)
+                              }}
+                              disabled={disableStates[submission.id]?.loading}
+                              className="bg-red-50 hover:bg-red-100 text-red-700"
+                            >
+                              <Lock className="h-3 w-3 mr-1" />
+                              {disableStates[submission.id]?.loading ? "Disabling..." : "Disable Link"}
+                            </Button>
+                          )}
+                        </>
                       ) : (
                         <Button
                           variant="outline"
@@ -820,6 +924,7 @@ export function SubmissionsTable({ submissions = [] }: { submissions: Submission
             submissions.map((submission) => {
               const existingLink = getExistingLink(submission)
               const isExpanded = expandedRows[submission.id] || false
+              const isDisabled = submission.disabled === true
 
               return (
                 <>
@@ -854,7 +959,14 @@ export function SubmissionsTable({ submissions = [] }: { submissions: Submission
                       </TooltipProvider>
                     </TableCell>
                     <TableCell onClick={() => toggleRowExpansion(submission.id)}>
-                      {getStatusBadge(submission.status)}
+                      <div className="flex flex-col gap-1">
+                        {getStatusBadge(submission.status)}
+                        {isDisabled && (
+                          <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
+                            Disabled
+                          </Badge>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell onClick={() => toggleRowExpansion(submission.id)}>
                       {submission.name ? (
@@ -904,15 +1016,41 @@ export function SubmissionsTable({ submissions = [] }: { submissions: Submission
                         )}
 
                         {existingLink || linkStates[submission.id]?.link ? (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="h-8"
-                            onClick={() => copyToClipboard(existingLink || linkStates[submission.id].link!)}
-                          >
-                            <Copy className="h-3 w-3 mr-1" />
-                            Copy Link
-                          </Button>
+                          <>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-8"
+                              onClick={() => copyToClipboard(existingLink || linkStates[submission.id].link!)}
+                            >
+                              <Copy className="h-3 w-3 mr-1" />
+                              Copy Link
+                            </Button>
+
+                            {isDisabled ? (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-8 bg-green-50 hover:bg-green-100 text-green-700"
+                                onClick={() => handleEnableToken(submission.id)}
+                                disabled={disableStates[submission.id]?.loading}
+                              >
+                                <Unlock className="h-3 w-3 mr-1" />
+                                {disableStates[submission.id]?.loading ? "Enabling..." : "Enable Link"}
+                              </Button>
+                            ) : (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-8 bg-red-50 hover:bg-red-100 text-red-700"
+                                onClick={() => handleDisableToken(submission.id)}
+                                disabled={disableStates[submission.id]?.loading}
+                              >
+                                <Lock className="h-3 w-3 mr-1" />
+                                {disableStates[submission.id]?.loading ? "Disabling..." : "Disable Link"}
+                              </Button>
+                            )}
+                          </>
                         ) : (
                           <Button
                             variant="outline"
