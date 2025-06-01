@@ -17,6 +17,7 @@ export function Step5Form({ submissionId, token }: { submissionId: string; token
   // Form state
   const [roadmapVideosWatched, setRoadmapVideosWatched] = useState(false)
   const [threeThingsWatched, setThreeThingsWatched] = useState(false)
+  const [v0PromptEngineeringWatched, setV0PromptEngineeringWatched] = useState(false)
   const [notionTutorialsWatched, setNotionTutorialsWatched] = useState(false)
   const [basecampWatched, setBasecampWatched] = useState(false)
   const [crmTutorialsWatched, setCrmTutorialsWatched] = useState(false)
@@ -33,6 +34,7 @@ export function Step5Form({ submissionId, token }: { submissionId: string; token
     if (
       !roadmapVideosWatched ||
       !threeThingsWatched ||
+      !v0PromptEngineeringWatched ||
       !notionTutorialsWatched ||
       !basecampWatched ||
       !crmTutorialsWatched ||
@@ -52,6 +54,7 @@ export function Step5Form({ submissionId, token }: { submissionId: string; token
       const formData = new FormData()
       formData.append("roadmapVideosWatched", roadmapVideosWatched.toString())
       formData.append("threeThingsWatched", threeThingsWatched.toString())
+      formData.append("v0PromptEngineeringWatched", v0PromptEngineeringWatched.toString())
       formData.append("notionTutorialsWatched", notionTutorialsWatched.toString())
       formData.append("basecampWatched", basecampWatched.toString())
       formData.append("crmTutorialsWatched", crmTutorialsWatched.toString())
@@ -163,15 +166,6 @@ export function Step5Form({ submissionId, token }: { submissionId: string; token
                       allowFullScreen
                     ></iframe>
                   </div>
-                  <div className="aspect-video w-full">
-                    <iframe
-                      src="https://www.youtube.com/embed/K6SwPslThyY"
-                      title="Roadmap"
-                      className="w-full h-full rounded-md"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    ></iframe>
-                  </div>
                 </div>
                 <div className="mt-4 flex items-center">
                   <Checkbox
@@ -219,6 +213,43 @@ export function Step5Form({ submissionId, token }: { submissionId: string; token
                     />
                     <Label htmlFor="three-things" className="text-sm">
                       I've watched the Three Things video
+                    </Label>
+                  </div>
+                </div>
+              </details>
+
+              <details className="group" open>
+                <summary className="flex cursor-pointer items-center justify-between rounded-lg bg-muted/50 px-4 py-2 text-sm font-medium">
+                  <span>Problem Solving in V0, Prompt Engineering, Frontend & Backend</span>
+                  <svg
+                    className="h-5 w-5 transition duration-300 group-open:rotate-180"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </summary>
+                <div className="mt-4 px-4">
+                  <div className="aspect-video w-full max-w-2xl mx-auto">
+                    <iframe
+                      src="https://www.youtube.com/embed/qC2_wDdiIgI"
+                      title="Intern Onboarding: Problem Solving in V0, Prompt Engineering, Frontend & Backend"
+                      className="w-full h-full rounded-md"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    ></iframe>
+                  </div>
+                  <div className="mt-4 flex items-center">
+                    <Checkbox
+                      id="v0-prompt-engineering"
+                      checked={v0PromptEngineeringWatched}
+                      onCheckedChange={(checked) => setV0PromptEngineeringWatched(checked === true)}
+                      className="mr-2 h-4 w-4"
+                    />
+                    <Label htmlFor="v0-prompt-engineering" className="text-sm">
+                      I've watched the Problem Solving in V0 video
                     </Label>
                   </div>
                 </div>
@@ -578,6 +609,14 @@ export function Step5Form({ submissionId, token }: { submissionId: string; token
               </div>
               <div className="flex items-center space-x-2">
                 <div
+                  className={`w-5 h-5 rounded-full flex items-center justify-center ${v0PromptEngineeringWatched ? "bg-green-100 text-green-600" : "bg-gray-100 text-gray-400"}`}
+                >
+                  {v0PromptEngineeringWatched ? "✓" : ""}
+                </div>
+                <span className="text-sm">Problem Solving in V0</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div
                   className={`w-5 h-5 rounded-full flex items-center justify-center ${notionTutorialsWatched ? "bg-green-100 text-green-600" : "bg-gray-100 text-gray-400"}`}
                 >
                   {notionTutorialsWatched ? "✓" : ""}
@@ -647,6 +686,7 @@ export function Step5Form({ submissionId, token }: { submissionId: string; token
                 if (
                   !roadmapVideosWatched ||
                   !threeThingsWatched ||
+                  !v0PromptEngineeringWatched ||
                   !notionTutorialsWatched ||
                   !basecampWatched ||
                   !crmTutorialsWatched ||
@@ -668,6 +708,7 @@ export function Step5Form({ submissionId, token }: { submissionId: string; token
                   const formData = new FormData()
                   formData.append("roadmapVideosWatched", roadmapVideosWatched.toString())
                   formData.append("threeThingsWatched", threeThingsWatched.toString())
+                  formData.append("v0PromptEngineeringWatched", v0PromptEngineeringWatched.toString())
                   formData.append("notionTutorialsWatched", notionTutorialsWatched.toString())
                   formData.append("basecampWatched", basecampWatched.toString())
                   formData.append("crmTutorialsWatched", crmTutorialsWatched.toString())
